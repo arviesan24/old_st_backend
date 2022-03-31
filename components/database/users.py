@@ -17,6 +17,7 @@ def login_user(username, password):
 
 def create_user(payload):
     user = rs.read_data('users', payload['username'])
+    print('res', user)
     if user:
         return jsonify({'error': 'Username already taken'}), 409
     payload['password'] = helpers.encrypt_password(payload['password'])
