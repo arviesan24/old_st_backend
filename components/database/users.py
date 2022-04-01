@@ -5,10 +5,7 @@ from components.utils import redis as rs
 
 
 def login_user(username, password):
-    res = rs.read_data(
-        collection='users',
-        key=username
-    )
+    res = rs.read_data(collection='users', key=username)
     if helpers.check_password(password, res['password']):
         return jsonify(jwt.sign_jwt(username)), 200
     else:
@@ -17,14 +14,9 @@ def login_user(username, password):
 
 def create_user(payload):
     user = rs.read_data('users', payload['username'])
-    print('res', user)
     if user:
         return jsonify({'error': 'Username already taken'}), 409
-    payload['password'] = helpers.encrypt_password(payload['password'])
-    rs.create_data(
-        collection='users',
-        key=payload['username'],
-        data=payload
-    )
 
+    payload['password'] = helpers.encrypt_password(payload['password'])
+    rs.create_data(collection='users', key=payload['username'], data=payload)
     return jsonify({'status': 'User created.'})
