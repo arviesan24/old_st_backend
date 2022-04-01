@@ -43,13 +43,12 @@ def check_token(f):
             token = request.headers["Authorization"].split(" ")[1]
         if not token:
             return {
-                "message": "Authentication Token is missing!",
-                "data": None,
-                "error": "Unauthorized"
+                "error": "Authentication Token is missing."
             }, 401
         result = decode_jwt(token)
         if result.get('error'):
             return result
-        return f(*args, **kwargs)
+        user = result
+        return f(user, *args, **kwargs)
 
     return decorated
