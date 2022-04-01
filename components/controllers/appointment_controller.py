@@ -23,10 +23,12 @@ def create_appointment_controller(payload):
 
 
 def edit_appointment_controller(payload):
-    # payload should contain the appointment id from frontend
+    if apt.is_appointment_accepted(payload['id']):
+        return jsonify({
+            'error': 'Changes not allowed. Appointment already accepted by physician.'}), 405
+
     apt_start = payload.get('start')
     apt_end = payload.get('end')
-    
     payload['accepted'] = False
     if not apt_start:
         return jsonify({'error': 'Start time and date is required.'}), 400
@@ -36,6 +38,7 @@ def edit_appointment_controller(payload):
         payload['assigned_to'] = None
     if not payload.get('accepted'):
         payload['accepted'] = False
+
     if not datetime_validator(apt_start):
         return jsonify({'error': 'Start time and date is invalid.'}), 400
     if not datetime_validator(apt_end):
