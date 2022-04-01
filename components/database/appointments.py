@@ -51,6 +51,14 @@ def search_appointment(start=None, end=None, assigned_doctor=None, accepted=None
     return jsonify({'data': appointments})
 
 
+def is_appointment_accepted(appointment_id):
+    res = rs.read_data(appointment_id)
+    accepted = res.get('accepted')
+    if accepted:
+        return True
+    return False
+
+# TODO: Create delete functionality
 
 
 
