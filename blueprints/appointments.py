@@ -23,3 +23,12 @@ def search(user):
     if user_type == 'scheduler':
         return apt_ctrl.search_appointment_controller(request.get_json())
     return jsonify({'error': 'Unauthorized access.'}), 401
+
+
+@blueprint.route("/update-appointment", methods=['POST'])
+@check_token
+def update(user):
+    user_type = check_user_type(user['userID'])
+    if user_type == 'scheduler':
+        return apt_ctrl.update_appointment_controller(request.get_json())
+    return jsonify({'error': 'Unauthorized access.'}), 401
