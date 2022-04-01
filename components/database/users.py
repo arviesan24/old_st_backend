@@ -1,5 +1,6 @@
 from flask import jsonify
 from components.utils import helpers
+from components.utils import jwt
 from components.utils import redis as rs
 
 
@@ -9,8 +10,7 @@ def login_user(username, password):
         key=username
     )
     if helpers.check_password(password, res['password']):
-        # TODO: return JWT token
-        return jsonify(res), 200
+        return jsonify(jwt.sign_jwt(username)), 200
     else:
         return jsonify({'error': 'Incorrect username or password.'}), 401
 
