@@ -21,3 +21,10 @@ def create_data(collection, key, data):
     return jsonify({
         'status': 'Record saved.'
     }), 200
+
+
+def get_all_from_collection(collection):
+    cursor, keys = r.scan(match=f'{collection}_*')
+    init_records = [item.decode('utf_8') for item in r.mget(keys)]
+    records = [json.loads(item) for item in init_records]
+    return records
