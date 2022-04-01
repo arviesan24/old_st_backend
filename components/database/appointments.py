@@ -1,3 +1,4 @@
+from email.mime import base
 import random
 import string
 import time
@@ -20,6 +21,10 @@ def update_appointment(payload):
     collection = 'appointments'
     key = payload['id'].split('_')[1]
     data = payload
+    base_appointment = get_appointment(payload['id'])
+    for k in base_appointment.keys():
+        if not data.get(k):
+            data[k] = base_appointment[k]
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment updated.'})
 
@@ -37,6 +42,15 @@ def list_appointments():
     return records
 
 
+def get_appointment(appointment_id):
+    collection = 'appointments'
+    key = appointment_id.split('_')[1]
+    res = rs.read_data(collection, key)
+    if res:
+        return res
+    return {}
+
+
 def search_appointment(start=None, end=None, assigned_doctor=None, accepted=None):
     appointments = list_appointments()
     print(appointments)
@@ -52,7 +66,9 @@ def search_appointment(start=None, end=None, assigned_doctor=None, accepted=None
 
 
 def is_appointment_accepted(appointment_id):
-    res = rs.read_data(appointment_id)
+    collection = 'appointments'
+    key = appointment_id.split('_')[1]
+    res = rs.read_data(collection, key)
     accepted = res.get('accepted')
     if accepted:
         return True
