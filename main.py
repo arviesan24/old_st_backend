@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
-from components.controllers import controller as ctrl
+from components.controllers import user_controller as user_ctrl
+from components.utils.jwt import check_token
 
 
 app = Flask(__name__)
@@ -14,12 +15,12 @@ def main():
 
 @app.route("/login", methods=['POST'])
 def login():
-    return ctrl.login_controller(request.get_json())
+    return user_ctrl.login_controller(request.get_json())
 
 
 @app.route("/create-user", methods=['POST'])
 def create_user():
-    return ctrl.create_user_controller(request.get_json())
+    return user_ctrl.create_user_controller(request.get_json())
 
 
 if __name__ == '__main__':
