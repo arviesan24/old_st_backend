@@ -20,3 +20,8 @@ def create_user(payload):
     payload['password'] = helpers.encrypt_password(payload['password'])
     rs.create_data(collection='users', key=payload['username'], data=payload)
     return jsonify({'status': 'User created.'})
+
+
+def list_users(collection):
+        result = rs.get_all_from_collection(collection)
+        return result
