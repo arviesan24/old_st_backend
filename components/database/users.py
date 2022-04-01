@@ -23,5 +23,10 @@ def create_user(payload):
 
 
 def list_users(collection):
-        result = rs.get_all_from_collection(collection)
-        return result
+    result = rs.get_all_from_collection(collection)
+    return result
+
+
+def check_user_type(username):
+    user = rs.read_data('users', username)
+    return user['type']
