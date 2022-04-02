@@ -1,5 +1,6 @@
 from flask import jsonify
 from components.database import appointments as apt
+from components.database import users as usr
 from components.utils.helpers import date_validator, time_validator
 
 
@@ -68,3 +69,17 @@ def search_appointment_controller(payload):
                     end=apt_end,
                     assigned_doctor=assigned_to,
                     accepted=accepted)
+
+
+def assign_appointment_controller(payload):
+    apt_id = payload.get('id')
+    assigned_doctor = payload.get('doctor')
+    if not apt_id:
+        return jsonify({"error": "Appointment ID missing."}), 400
+    if not assigned_doctor:
+        return jsonify({"error": "Select a doctor to assign."}), 400
+    is_doctor_available = usr.is_doctor_available(assigned_doctor)
+    if not is_doctor_available:
+        return jsonify({"error": "Selected doctor not available."}), 400
+
+    return apt.assign_appointment(apt_id, assigned_doctor)
