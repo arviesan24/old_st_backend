@@ -111,5 +111,19 @@ def assign_appointment_controller(payload):
     is_doctor_available = usr.is_doctor_available(assigned_doctor)
     if not is_doctor_available:
         return jsonify({"error": "Selected doctor not available."}), 400
-
     return apt.assign_appointment(apt_id, assigned_doctor)
+
+
+def delete_appointment_controller(payload):
+    appointment_id = payload.get('id')
+    if not appointment_id:
+        return jsonify({"error": "Appointment ID is required."}), 400
+    return apt.delete_appointment(appointment_id)
+
+
+def accept_appointment_controller(user_id, payload):
+    appointment_id = payload.get('id')
+    appointment = apt.get_appointment(appointment_id)
+    if appointment['assigned_to'] != user_id:
+        return jsonify({"error": "This appointment is not assigned to you."}), 400
+    return apt.accept_appointment(payload)
