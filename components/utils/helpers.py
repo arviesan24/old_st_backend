@@ -19,9 +19,17 @@ def check_password(pwd, hashed_pwd):
     return bcrypt.checkpw(pwd, hashed_pwd)
 
 
-def datetime_validator(datetime_str):
+def date_validator(date_str):
     try:
-        datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
+        datetime.strptime(date_str, "%Y-%m-%d")
+        return True
+    except:
+        return False
+
+
+def time_validator(time_str):
+    try:
+        datetime.strptime(time_str, "%H:%M")
         return True
     except:
         return False
