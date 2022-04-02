@@ -48,6 +48,16 @@ def search_doctor(username):
 
 def is_doctor_available(username):
     doctor = search_doctor(username)
-    if doctor['available'] == True:
+    if doctor.get('available') == True:
         return True
     return False
+
+
+def change_doctor_availability(username, available):
+    try:
+        doctor = search_doctor(username)
+        doctor['available'] = available
+        rs.create_data('users', username, doctor)
+        return jsonify({'status': 'Doctor availability changed.'})
+    except:
+        return jsonify({'error': 'Error changing doctor availability.'})
