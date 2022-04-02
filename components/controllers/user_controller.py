@@ -20,7 +20,7 @@ def create_user_controller(payload):
     if not payload.get('type'):
         return jsonify({'error': 'User type is required.'}), 400
     if payload['type'].lower() == 'doctor':
-        if not payload.get('available'):
+        if payload.get('available') == None:
             return jsonify({'error': 'Availability is required.'}), 400
     return usr.create_user(payload)
     
