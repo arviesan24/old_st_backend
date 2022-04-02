@@ -118,3 +118,9 @@ def accept_appointment_controller(user_id, payload):
     if appointment['assigned_to'] != user_id:
         return jsonify({"error": "This appointment is not assigned to you."}), 400
     return apt.accept_appointment(payload)
+
+
+def doctor_appointments_controller(doctor):
+    if not doctor:
+        return jsonify({"error": "No doctor selected."}), 400
+    return apt.doctor_appointments(doctor)
