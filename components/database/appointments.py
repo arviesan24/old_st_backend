@@ -50,9 +50,10 @@ def get_appointment(appointment_id):
     return {}
 
 
-def search_appointment(start=None, end=None, assigned_doctor=None, accepted=None):
+def search_appointment(_date=None, start=None, end=None, assigned_doctor=None, accepted=None):
     appointments = list_appointments()
-    print(appointments)
+    if _date:
+        appointments = [item for item in appointments if item['date']==_date]
     if start:
         appointments = [item for item in appointments if item['start']==start]
     if end:
@@ -72,9 +73,3 @@ def is_appointment_accepted(appointment_id):
     if accepted:
         return True
     return False
-
-# TODO: Create delete functionality
-
-
-
-# TODO: Complete appointment database then create controllers for it
