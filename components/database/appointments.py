@@ -99,3 +99,12 @@ def accept_appointment(payload):
     new_payload['id'] = payload['id']
     new_payload['accepted'] = True
     return update_appointment(new_payload)
+
+
+def doctor_appointments(doctor):
+    records = rs.get_all_from_collection('appointments')
+    appointments = [
+        appointment for appointment in records \
+        if appointment['assigned_to']==doctor
+    ]
+    return jsonify({'data': appointments})
