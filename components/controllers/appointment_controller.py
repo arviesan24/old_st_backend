@@ -89,6 +89,8 @@ def search_appointment_controller(payload):
         return jsonify({"error": "Start date is invalid. Format('YYYY-MM-DD')"}), 400
     if end_date and not date_validator(end_date):
         return jsonify({"error": "End date is invalid. Format('YYYY-MM-DD')"}), 400
+    if start_date > end_date:
+        return jsonify({"error": "Start date should be same or later than end date."}), 400
     return apt.search_appointment(start_date, end_date)
 
 
@@ -120,7 +122,21 @@ def accept_appointment_controller(user_id, payload):
     return apt.accept_appointment(payload)
 
 
-def doctor_appointments_controller(doctor):
-    if not doctor:
-        return jsonify({"error": "No doctor selected."}), 400
+def my_appointments_controller(doctor):
     return apt.doctor_appointments(doctor)
+
+
+def my_appointments_search_controller(doctor, payload):
+    start_date = payload.get('start_date')
+    end_date = payload.get('end_date')
+    accepted = payload.get('accepted')
+    if not start_date or not date_validator(start_date):
+        return jsonify({"error": "Start date is missing or invalid. Format('YYYY-MM-DD')"}), 400
+    if not end_date or not date_validator(end_date):
+        return jsonify({"error": "End date is missing or invalid. Format('YYYY-MM-DD')"}), 400
+    if start_date > end_date:
+        return jsonify({"error": "Start date should be same or later than end date."}), 400
+    if accepted is None or not isinstance(accepted, bool):
+        return jsonify({"error": "Accepted field is missing or invalid. Accepts boolean data."}), 400
+    return apt.my_appointments_search(doctor, start_date, end_date, accepted)
+

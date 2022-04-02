@@ -108,3 +108,24 @@ def doctor_appointments(doctor):
         if appointment['assigned_to']==doctor
     ]
     return jsonify({'data': appointments})
+
+
+def my_appointments_search(doctor, start_date, end_date, accepted):
+    records = rs.get_all_from_collection('appointments')
+    my_appointments = [
+        appointment for appointment in records \
+        if appointment['assigned_to']==doctor
+    ]
+    if len(my_appointments) == 0:
+        return jsonify({'data': []})
+
+    filtered_appointments = [
+        appointment for appointment in my_appointments \
+        if appointment['date'] >= start_date \
+        and appointment['date'] <= end_date
+    ]
+    output_appointment = [
+        appointment for appointment in filtered_appointments \
+        if appointment['accepted'] == accepted
+    ]
+    return jsonify({'data': output_appointment})

@@ -61,10 +61,19 @@ def delete(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/doctor-appointments")
+@blueprint.route("/my-appointments")
 @check_token
-def doctor_appointments(user):
+def my_appointments(user):
     user_type = check_user_type(user['userID'])
     if user_type == 'doctor':
-        return apt_ctrl.doctor_appointments_controller(user['userID'])
+        return apt_ctrl.my_appointments_controller(user['userID'])
+    return jsonify({'error': 'Unauthorized access.'}), 401
+
+
+@blueprint.route("/my-appointments-search", methods=['POST'])
+@check_token
+def my_appointments_search(user):
+    user_type = check_user_type(user['userID'])
+    if user_type == 'doctor':
+        return apt_ctrl.my_appointments_search_controller(user['userID'], request.get_json())
     return jsonify({'error': 'Unauthorized access.'}), 401
