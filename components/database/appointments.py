@@ -16,7 +16,7 @@ def create_appointment(payload):
     appointments = list_appointments()
     same_date_appointments = [apt['id'] for apt in appointments if apt['date']==payload['date']]
     if len(same_date_appointments) >= 5:
-        return jsonify({'error': 'There are already 5 appointments scheduled for the selected date.'})
+        return jsonify({'error': 'There are already 5 appointments scheduled for the selected date.'}), 405
 
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment created.'})
@@ -35,7 +35,7 @@ def update_appointment(payload):
     same_date_appointments = [apt['id'] for apt in appointments if apt['date']==payload['date']]
     same_date_appointments.remove(payload['id'])
     if len(same_date_appointments) >= 5:
-        return jsonify({'error': 'There are already 5 appointments scheduled for the selected date.'})
+        return jsonify({'error': 'There are already 5 appointments scheduled for the selected date.'}), 405
 
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment updated.'})
@@ -47,7 +47,7 @@ def assign_appointment(appointment, doctor):
     data = rs.read_data(collection, key)
     data['assigned_to'] = doctor
     rs.create_data(collection, key, data)
-    return jsonify({'status': f'Appointment assigned to the doctor.'})
+    return jsonify({'status': 'Appointment assigned to the doctor.'})
 
 
 def list_appointments():
@@ -87,3 +87,20 @@ def is_appointment_accepted(appointment_id):
     if accepted:
         return True
     return False
+
+
+def delete_appointment(appointment_id):
+    appointment = get_appointment(appointment_id)
+    if not appointment.get('accepted'):
+        collection = 'appointments'
+        key = appointment_id.split('_')[1]
+        rs.delete_item(collection, key)
+        return jsonify({'status': 'Appointment successfully deleted.'})
+    return jsonify({'error': 'Cannot delete already accepted appointment.'}), 405
+
+
+def accept_appointment(payload):
+    new_payload = dict()
+    new_payload['id'] = payload['id']
+    new_payload['accepted'] = True
+    return update_appointment(new_payload)
