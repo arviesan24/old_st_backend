@@ -50,3 +50,12 @@ def accept(user):
     if user_type == 'doctor':
         return apt_ctrl.accept_appointment_controller(user['userID'], request.get_json())
     return jsonify({'error': 'Unauthorized access.'}), 401
+
+
+@blueprint.route("/delete-appointment", methods=['POST'])
+@check_token
+def delete(user):
+    user_type = check_user_type(user['userID'])
+    if user_type == 'scheduler':
+        return apt_ctrl.delete_appointment_controller(request.get_json())
+    return jsonify({'error': 'Unauthorized access.'}), 401
