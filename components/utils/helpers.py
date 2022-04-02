@@ -40,3 +40,23 @@ def string_to_datetime(str):
         return datetime.strptime(str, "%Y-%m-%d %H:%M")
     except:
         return str
+
+
+def schedule_date_validator(date):
+    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    day_of_week = date_obj.isoweekday()
+    if day_of_week == 7:
+        return False
+    return True
+
+
+def start_time_validator(start):
+    if start >= '09:00':
+        return True
+    return False
+
+
+def end_time_validator(end):
+    if end <= '17:00':
+        return True
+    return False
