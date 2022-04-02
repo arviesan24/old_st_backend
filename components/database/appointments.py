@@ -12,6 +12,12 @@ def create_appointment(payload):
     id = f'{collection}_{key}'
     payload['id'] = id
     data = payload
+
+    appointments = list_appointments()
+    same_date_appointments = [apt['id'] for apt in appointments if apt['date']==payload['date']]
+    if len(same_date_appointments) >= 5:
+        return jsonify({'error': 'There are already 5 appointments scheduled for the selected date.'})
+
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment created.'})
 
@@ -24,8 +30,16 @@ def update_appointment(payload):
     for k in base_appointment.keys():
         if not data.get(k):
             data[k] = base_appointment[k]
+
+    appointments = list_appointments()
+    same_date_appointments = [apt['id'] for apt in appointments if apt['date']==payload['date']]
+    same_date_appointments.remove(payload['id'])
+    if len(same_date_appointments) >= 5:
+        return jsonify({'error': 'There are already 5 appointments scheduled for the selected date.'})
+
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment updated.'})
+
 
 def assign_appointment(appointment, doctor):
     collection = 'appointments'
