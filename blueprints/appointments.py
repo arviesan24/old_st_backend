@@ -41,3 +41,12 @@ def assign(user):
     if user_type == 'scheduler':
         return apt_ctrl.assign_appointment_controller(request.get_json())
     return jsonify({'error': 'Unauthorized access.'}), 401
+
+
+@blueprint.route("/accept-appointment", methods=['POST'])
+@check_token
+def accept(user):
+    user_type = check_user_type(user['userID'])
+    if user_type == 'doctor':
+        return apt_ctrl.accept_appointment_controller(user['userID'], request.get_json())
+    return jsonify({'error': 'Unauthorized access.'}), 401
