@@ -20,7 +20,6 @@ def create_user():
 @blueprint.route("/change-doctor-availability", methods=['POST'])
 @check_token
 def doctor_availability(user):
-    user_type = check_user_type(user['userID'])
-    if user_type == 'scheduler':
-        return user_ctrl.change_doctor_availability_controller(request.get_json())
+    if user:
+        return user_ctrl.change_doctor_availability_controller(user, request.get_json())
     return jsonify({'error': 'Unauthorized access.'}), 401
