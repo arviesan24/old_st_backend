@@ -5,6 +5,13 @@ from flask import jsonify
 from components.utils import redis as rs
 
 
+def apt_for_the_date(date):
+    appointments = list_appointments()
+    scheduled_appointments = [
+        apt['id'] for apt in appointments if apt['date']==date]
+    return scheduled_appointments
+
+
 def create_appointment(payload):
     collection = 'appointments'
     random_str = ''.join(random.choices(string.ascii_lowercase, k=3))
@@ -13,10 +20,11 @@ def create_appointment(payload):
     payload['id'] = id
     data = payload
 
-    appointments = list_appointments()
-    same_date_appointments = [apt['id'] for apt in appointments if apt['date']==payload['date']]
-    if len(same_date_appointments) >= 5:
-        return jsonify({'error': 'There are already 5 appointments scheduled for the selected date.'}), 405
+    appointment_count = len(apt_for_the_date(payload['date']))
+    if  appointment_count >= 5:
+        return jsonify({
+            'error': 'There are already 5 appointments scheduled for the selected date.'
+        }), 405
 
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment created.'})
@@ -31,11 +39,13 @@ def update_appointment(payload):
         if not data.get(k):
             data[k] = base_appointment[k]
 
-    appointments = list_appointments()
-    same_date_appointments = [apt['id'] for apt in appointments if apt['date']==payload['date']]
-    same_date_appointments.remove(payload['id'])
+    same_date_appointments = apt_for_the_date(payload['date'])
+    if payload['id'] in same_date_appointments:
+        same_date_appointments.remove(payload['id'])
     if len(same_date_appointments) >= 5:
-        return jsonify({'error': 'There are already 5 appointments scheduled for the selected date.'}), 405
+        return jsonify({
+            'error': 'There are already 5 appointments scheduled for the selected date.'
+        }), 405
 
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment updated.'})
@@ -94,7 +104,25 @@ def delete_appointment(appointment_id):
     return jsonify({'error': 'Cannot delete already accepted appointment.'}), 405
 
 
-def accept_appointment(payload):
+def accept_appointment(doctor, payload):
+    records = rs.get_all_from_collection('appointments')
+    selected_appointment = get_appointment(payload['id'])
+    my_appointments = [
+        appointment for appointment in records \
+        if appointment['assigned_to']==doctor
+    ]
+    same_date_appointments = [
+        appointment for appointment in my_appointments \
+        if appointment['date']==selected_appointment['date'] \
+        and appointment['accepted']==True \
+        and not appointment['id']==selected_appointment['id']
+    ]
+
+    if len(same_date_appointments) >= 3:
+        return jsonify({
+            'error': 'You already accepted 3 other appointments for the selected date.'
+        }), 405
+
     new_payload = dict()
     new_payload['id'] = payload['id']
     new_payload['accepted'] = True
@@ -129,3 +157,6 @@ def my_appointments_search(doctor, start_date, end_date, accepted):
         if appointment['accepted'] == accepted
     ]
     return jsonify({'data': output_appointment})
+
+
+# TODO: Figure out how to implement send email

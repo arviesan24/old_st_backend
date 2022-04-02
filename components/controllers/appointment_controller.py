@@ -79,16 +79,19 @@ def update_appointment_controller(payload):
 
     if apt_start and not hlp.time_validator(apt_start):
         return jsonify({"error": "Start time is invalid. Format('HH:MM')"}), 400
-    if not hlp.start_time_validator(apt_start):
+    if apt_start and not hlp.start_time_validator(apt_start):
         return jsonify({"error": "Booking starts at 09:00AM."}), 400
 
     if apt_end and not hlp.time_validator(apt_end):
         return jsonify({"error": "End time is invalid. Format('HH:MM')"}), 400
-    if not hlp.end_time_validator(apt_end):
+    if apt_start and not hlp.end_time_validator(apt_end):
         return jsonify({"error": "Booking ends at 05:00PM."}), 400
 
-    if apt_start and apt_end and apt_start >= apt_end:
-        return jsonify({"error": "End time should be later than start time."}), 400
+    if apt_start and apt_end:
+        if apt_start and apt_end and apt_start >= apt_end:
+            return jsonify({
+                "error": "End time should be later than start time."
+            }), 400
 
     if apt.is_appointment_accepted(payload['id']):
         return jsonify({
@@ -134,7 +137,7 @@ def accept_appointment_controller(user_id, payload):
     appointment = apt.get_appointment(appointment_id)
     if appointment['assigned_to'] != user_id:
         return jsonify({"error": "This appointment is not assigned to you."}), 400
-    return apt.accept_appointment(payload)
+    return apt.accept_appointment(user_id, payload)
 
 
 def my_appointments_controller(doctor):
