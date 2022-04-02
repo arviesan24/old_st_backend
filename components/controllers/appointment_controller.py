@@ -95,7 +95,8 @@ def update_appointment_controller(payload):
 
     if apt.is_appointment_accepted(payload['id']):
         return jsonify({
-            "error": "Changes not allowed. Appointment already accepted by physician."}), 405
+            "error": "Changes not allowed. Appointment already accepted by physician."
+        }), 405
 
     return apt.update_appointment(payload)
 
@@ -149,12 +150,20 @@ def my_appointments_search_controller(doctor, payload):
     end_date = payload.get('end_date')
     accepted = payload.get('accepted')
     if not start_date or not hlp.date_validator(start_date):
-        return jsonify({"error": "Start date is missing or invalid. Format('YYYY-MM-DD')"}), 400
+        return jsonify({
+            "error": "Start date is missing or invalid. Format('YYYY-MM-DD')"
+        }), 400
     if not end_date or not hlp.date_validator(end_date):
-        return jsonify({"error": "End date is missing or invalid. Format('YYYY-MM-DD')"}), 400
+        return jsonify({
+            "error": "End date is missing or invalid. Format('YYYY-MM-DD')"
+        }), 400
     if start_date > end_date:
-        return jsonify({"error": "Start date should be same or later than end date."}), 400
+        return jsonify({
+            "error": "Start date should be same or later than end date."
+        }), 400
     if accepted is None or not isinstance(accepted, bool):
-        return jsonify({"error": "Accepted field is missing or invalid. Accepts boolean data."}), 400
+        return jsonify({
+            "error": "Accepted field is missing or invalid. Accepts boolean data."
+        }), 400
     return apt.my_appointments_search(doctor, start_date, end_date, accepted)
 
