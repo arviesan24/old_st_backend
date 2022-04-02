@@ -83,22 +83,13 @@ def update_appointment_controller(payload):
 
 
 def search_appointment_controller(payload):
-    apt_date = payload.get('date')
-    apt_start = payload.get('start')
-    apt_end = payload.get('end')
-    assigned_to = payload.get('assigned_to')
-    accepted = payload.get('accepted')
-    if apt_date and not date_validator(apt_date):
-        return jsonify({"error": "Date is invalid. Format('YYYY-MM-DD')"}), 400
-    if apt_start and not time_validator(apt_start):
-        return jsonify({"error": "Start time is invalid. Format('HH:MM')"}), 400
-    if apt_end and not time_validator(apt_end):
-        return jsonify({"error": "End time is invalid. Format('HH:MM')"}), 400
-    return apt.search_appointment(
-                    start=apt_start,
-                    end=apt_end,
-                    assigned_doctor=assigned_to,
-                    accepted=accepted)
+    start_date = payload.get('start_date')
+    end_date = payload.get('end_date')
+    if start_date and not date_validator(start_date):
+        return jsonify({"error": "Start date is invalid. Format('YYYY-MM-DD')"}), 400
+    if end_date and not date_validator(end_date):
+        return jsonify({"error": "End date is invalid. Format('YYYY-MM-DD')"}), 400
+    return apt.search_appointment(start_date, end_date)
 
 
 def assign_appointment_controller(payload):
