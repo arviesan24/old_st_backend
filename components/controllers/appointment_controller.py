@@ -5,23 +5,53 @@ from components.utils.helpers import date_validator, time_validator
 
 
 def create_appointment_controller(payload):
+    """
+    {
+        "date": str,
+        "start": str,
+        "end": str,
+        "assigned_to": str,
+        "patient_name": str,
+        "comment": str,
+        "accepted": bool
+    }
+    """
     apt_date = payload.get('date')
     apt_start = payload.get('start')
     apt_end = payload.get('end')
-    payload['assigned_to'] = None
+    doctor = payload.get('assigned_to')
+    patient_name = payload.get('patient_name')
+    comment = payload.get('comment')
     payload['accepted'] = False
+
+    if not comment:
+        payload['comment'] = None
+
     if not apt_date:
         return jsonify({"error": "Date is required."}), 400
-    if not apt_start:
-        return jsonify({"error": "Start time is required."}), 400
-    if not apt_end:
-        return jsonify({"error": "End time is required."}), 400
     if not date_validator(apt_date):
         return jsonify({"error": "Date is invalid. Format('YYYY-MM-DD')"}), 400
+
+    if not apt_start:
+        return jsonify({"error": "Start time is required."}), 400
     if not time_validator(apt_start):
         return jsonify({"error": "Start time is invalid. Format('HH:MM')"}), 400
+
+    if not apt_end:
+        return jsonify({"error": "End time is required."}), 400
     if not time_validator(apt_end):
         return jsonify({"error": "End time is invalid. Format('HH:MM')"}), 400
+
+    if not patient_name:
+        return jsonify({"error": "Patient's name is required."}), 400
+
+    if not doctor:
+        payload['assigned_to'] = None
+    else:
+        is_doctor_available = usr.is_doctor_available(doctor)
+        if not is_doctor_available:
+            return jsonify({"error": "Selected doctor not available."}), 400
+
     if apt_start >= apt_end:
         return jsonify({"error": "End time should be later than start time."}), 400
 
