@@ -64,18 +64,13 @@ def get_appointment(appointment_id):
     return {}
 
 
-def search_appointment(_date=None, start=None, end=None, assigned_doctor=None, accepted=None):
+def search_appointment(start_date, end_date):
     appointments = list_appointments()
-    if _date:
-        appointments = [item for item in appointments if item['date']==_date]
-    if start:
-        appointments = [item for item in appointments if item['start']==start]
-    if end:
-        appointments = [item for item in appointments if item['end']==end]
-    if assigned_doctor:
-        appointments = [item for item in appointments if item['assigned_to']==assigned_doctor]
-    if accepted:
-        appointments = [item for item in appointments if item['accepted']==accepted]
+    appointments = [
+        appointment for appointment in appointments \
+        if appointment['date'] >= start_date \
+        and appointment['date'] <= end_date
+    ]
     return jsonify({'data': appointments})
 
 
