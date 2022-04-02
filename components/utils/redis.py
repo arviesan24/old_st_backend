@@ -28,3 +28,10 @@ def get_all_from_collection(collection):
     init_records = [item.decode('utf_8') for item in r.mget(keys)]
     records = [json.loads(item) for item in init_records]
     return records
+
+
+def delete_item(collection, key):
+    r.delete(f'{collection}_{key}')
+    return jsonify({
+        'status': 'Record deleted.'
+    }), 200
