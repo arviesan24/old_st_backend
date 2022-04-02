@@ -22,11 +22,32 @@ def create_user(payload):
     return jsonify({'status': 'User created.'})
 
 
-def list_users(collection):
-    result = rs.get_all_from_collection(collection)
+def list_users():
+    result = rs.get_all_from_collection('users')
     return result
 
 
 def check_user_type(username):
     user = rs.read_data('users', username)
     return user['type']
+
+
+def list_doctors():
+    result = list_users()
+    output = [user for user in result if user['type']=='doctor']
+    return output
+
+
+def search_doctor(username):
+    doctors = list_doctors()
+    for doctor in doctors:
+        if doctor['username'] == username:
+            return doctor
+    return {}
+
+
+def is_doctor_available(username):
+    doctor = search_doctor(username)
+    if doctor['available'] == True:
+        return True
+    return False
