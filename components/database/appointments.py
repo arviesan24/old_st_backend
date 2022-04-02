@@ -25,6 +25,9 @@ def create_appointment(payload):
         return jsonify({
             'error': 'There are already 5 appointments scheduled for the selected date.'
         }), 405
+    doctor = payload.get('assigned_to')
+    if appointment_conflict(doctor, payload['date'], payload['start'], payload['end']):
+        return jsonify({'error': 'Doctor has a conflicting schedule.'}), 405
 
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment created.'})
@@ -35,6 +38,7 @@ def update_appointment(payload):
     key = payload['id'].split('_')[1]
     data = payload
     base_appointment = get_appointment(payload['id'])
+    # supply dict with the data from base appointment if missing from payload
     for k in base_appointment.keys():
         if not data.get(k):
             data[k] = base_appointment[k]
@@ -47,6 +51,14 @@ def update_appointment(payload):
             'error': 'There are already 5 appointments scheduled for the selected date.'
         }), 405
 
+    apt_id = data.get('id')
+    doctor = data.get('assigned_to')
+    conflict_apt_list = appointment_conflict(doctor, data['date'], data['start'], data['end'])
+    if apt_id in conflict_apt_list:
+        conflict_apt_list.remove(apt_id)
+    if conflict_apt_list:
+        return jsonify({'error': 'Doctor has a conflicting schedule.'}), 405
+
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment updated.'})
 
@@ -55,6 +67,8 @@ def assign_appointment(appointment, doctor):
     collection = 'appointments'
     key = appointment.split('_')[1]
     data = rs.read_data(collection, key)
+    if appointment_conflict(doctor, data['date'], data['start'], data['end']):
+        return jsonify({'error': 'Doctor is not available on this schedule.'}), 405
     data['assigned_to'] = doctor
     rs.create_data(collection, key, data)
     return jsonify({'status': 'Appointment assigned to the doctor.'})
@@ -129,21 +143,22 @@ def accept_appointment(doctor, payload):
     return update_appointment(new_payload)
 
 
-def doctor_appointments(doctor):
+def __doctor_appointments(doctor):
     records = rs.get_all_from_collection('appointments')
     appointments = [
         appointment for appointment in records \
         if appointment['assigned_to']==doctor
     ]
+    return appointments
+
+
+def doctor_appointments(doctor):
+    appointments = __doctor_appointments(doctor)
     return jsonify({'data': appointments})
 
 
 def my_appointments_search(doctor, start_date, end_date, accepted):
-    records = rs.get_all_from_collection('appointments')
-    my_appointments = [
-        appointment for appointment in records \
-        if appointment['assigned_to']==doctor
-    ]
+    my_appointments = __doctor_appointments(doctor)
     if len(my_appointments) == 0:
         return jsonify({'data': []})
 
@@ -159,4 +174,23 @@ def my_appointments_search(doctor, start_date, end_date, accepted):
     return jsonify({'data': output_appointment})
 
 
-# TODO: Figure out how to implement send email
+def appointment_conflict(doctor, date, start, end):
+    if doctor is None:
+        return []
+
+    appointments = __doctor_appointments(doctor)
+    dated_appointments = [
+        apppointment for apppointment in appointments \
+        if apppointment['date'] == date
+    ]
+
+    conflict_list_id = list()
+    for dated_apt in dated_appointments:
+        if (
+            (dated_apt['start'] < start and start < dated_apt['end']) or
+            (dated_apt['start'] < end and end < dated_apt['end']) or
+            (start < dated_apt['start'] and dated_apt['end'] < end) or
+            (dated_apt['start'] < start and end < dated_apt['end'])
+        ):
+            conflict_list_id.append(dated_apt['id'])
+    return conflict_list_id
