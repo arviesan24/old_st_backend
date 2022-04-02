@@ -1,7 +1,7 @@
 from flask import jsonify
 from components.database import appointments as apt
 from components.database import users as usr
-from components.utils.helpers import date_validator, time_validator
+from components.utils import helpers as hlp
 
 
 def create_appointment_controller(payload):
@@ -29,18 +29,24 @@ def create_appointment_controller(payload):
 
     if not apt_date:
         return jsonify({"error": "Date is required."}), 400
-    if not date_validator(apt_date):
+    if not hlp.date_validator(apt_date):
         return jsonify({"error": "Date is invalid. Format('YYYY-MM-DD')"}), 400
+    if not hlp.schedule_date_validator(apt_date):
+        return jsonify({"error": "Cannot book on Sundays."}), 400
 
     if not apt_start:
         return jsonify({"error": "Start time is required."}), 400
-    if not time_validator(apt_start):
+    if not hlp.time_validator(apt_start):
         return jsonify({"error": "Start time is invalid. Format('HH:MM')"}), 400
+    if not hlp.start_time_validator(apt_start):
+        return jsonify({"error": "Booking starts at 09:00AM."}), 400
 
     if not apt_end:
         return jsonify({"error": "End time is required."}), 400
-    if not time_validator(apt_end):
+    if not hlp.time_validator(apt_end):
         return jsonify({"error": "End time is invalid. Format('HH:MM')"}), 400
+    if not hlp.end_time_validator(apt_end):
+        return jsonify({"error": "Booking ends at 05:00PM."}), 400
 
     if not patient_name:
         return jsonify({"error": "Patient's name is required."}), 400
@@ -66,12 +72,21 @@ def update_appointment_controller(payload):
 
     if not apt_id:
         return jsonify({"error": "Appointment ID missing."}), 400
-    if apt_date and not date_validator(apt_date):
+    if apt_date and not hlp.date_validator(apt_date):
         return jsonify({"error": "Date is invalid. Format('YYYY-MM-DD')"}), 400
-    if apt_start and not time_validator(apt_start):
+    if not hlp.schedule_date_validator(apt_date):
+        return jsonify({"error": "Cannot book on Sundays."}), 400
+
+    if apt_start and not hlp.time_validator(apt_start):
         return jsonify({"error": "Start time is invalid. Format('HH:MM')"}), 400
-    if apt_end and not time_validator(apt_end):
+    if not hlp.start_time_validator(apt_start):
+        return jsonify({"error": "Booking starts at 09:00AM."}), 400
+
+    if apt_end and not hlp.time_validator(apt_end):
         return jsonify({"error": "End time is invalid. Format('HH:MM')"}), 400
+    if not hlp.end_time_validator(apt_end):
+        return jsonify({"error": "Booking ends at 05:00PM."}), 400
+
     if apt_start and apt_end and apt_start >= apt_end:
         return jsonify({"error": "End time should be later than start time."}), 400
 
@@ -85,9 +100,9 @@ def update_appointment_controller(payload):
 def search_appointment_controller(payload):
     start_date = payload.get('start_date')
     end_date = payload.get('end_date')
-    if start_date and not date_validator(start_date):
+    if start_date and not hlp.date_validator(start_date):
         return jsonify({"error": "Start date is invalid. Format('YYYY-MM-DD')"}), 400
-    if end_date and not date_validator(end_date):
+    if end_date and not hlp.date_validator(end_date):
         return jsonify({"error": "End date is invalid. Format('YYYY-MM-DD')"}), 400
     if start_date > end_date:
         return jsonify({"error": "Start date should be same or later than end date."}), 400
@@ -130,9 +145,9 @@ def my_appointments_search_controller(doctor, payload):
     start_date = payload.get('start_date')
     end_date = payload.get('end_date')
     accepted = payload.get('accepted')
-    if not start_date or not date_validator(start_date):
+    if not start_date or not hlp.date_validator(start_date):
         return jsonify({"error": "Start date is missing or invalid. Format('YYYY-MM-DD')"}), 400
-    if not end_date or not date_validator(end_date):
+    if not end_date or not hlp.date_validator(end_date):
         return jsonify({"error": "End date is missing or invalid. Format('YYYY-MM-DD')"}), 400
     if start_date > end_date:
         return jsonify({"error": "Start date should be same or later than end date."}), 400
