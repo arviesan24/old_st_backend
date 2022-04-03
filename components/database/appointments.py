@@ -190,7 +190,8 @@ def appointment_conflict(doctor, date, start, end):
             (dated_apt['start'] < start and start < dated_apt['end']) or
             (dated_apt['start'] < end and end < dated_apt['end']) or
             (start < dated_apt['start'] and dated_apt['end'] < end) or
-            (dated_apt['start'] < start and end < dated_apt['end'])
+            (dated_apt['start'] < start and end < dated_apt['end']) or
+            (dated_apt['start'] == start and end == dated_apt['end'])
         ):
             conflict_list_id.append(dated_apt['id'])
     return conflict_list_id
