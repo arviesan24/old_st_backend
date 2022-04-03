@@ -8,7 +8,7 @@ from components.utils.email_template import new_appointment, updated_appointment
 
 def send_email(doctor, appointment, updated_apt=False):
     sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
-    from_email = Email("ctechnology24@gmail.com")
+    from_email = Email(config('FROM_EMAIL'))
     if updated_apt:
         subject = "Updated Appointment"
         template_text = updated_appointment
