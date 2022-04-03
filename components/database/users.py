@@ -7,7 +7,10 @@ from components.utils import redis as rs
 def login_user(username, password):
     res = rs.read_data(collection='users', key=username)
     if helpers.check_password(password, res['password']):
-        return jsonify(jwt.sign_jwt(username)), 200
+        token_response = jwt.sign_jwt(username)
+        user_data = {'user': res['username'], 'type': res['type']}
+        merged_data = {**token_response, **user_data}
+        return jsonify(merged_data), 200
     else:
         return jsonify({'error': 'Incorrect username or password.'}), 401
 
