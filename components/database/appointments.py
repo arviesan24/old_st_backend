@@ -2,6 +2,7 @@ import random
 import string
 import time
 from flask import jsonify
+from components.utils.sendgrid_mail import send_email
 from components.utils import redis as rs
 
 
@@ -18,7 +19,6 @@ def create_appointment(payload):
     key = f'{time.time()}{random_str}'
     id = f'{collection}_{key}'
     payload['id'] = id
-    data = payload
 
     appointment_count = len(apt_for_the_date(payload['date']))
     if  appointment_count >= 5:
@@ -29,7 +29,9 @@ def create_appointment(payload):
     if appointment_conflict(doctor, payload['date'], payload['start'], payload['end']):
         return jsonify({'error': 'Doctor has a conflicting schedule.'}), 405
 
-    rs.create_data(collection, key, data)
+    rs.create_data(collection, key, payload)
+    if doctor:
+        send_email(doctor, payload)
     return jsonify({'status': 'Appointment created.'})
 
 
@@ -58,8 +60,9 @@ def update_appointment(payload):
         conflict_apt_list.remove(apt_id)
     if conflict_apt_list:
         return jsonify({'error': 'Doctor has a conflicting schedule.'}), 405
-
     rs.create_data(collection, key, data)
+    if doctor:
+        send_email(doctor, data, True)
     return jsonify({'status': 'Appointment updated.'})
 
 
@@ -71,6 +74,7 @@ def assign_appointment(appointment, doctor):
         return jsonify({'error': 'Doctor is not available on this schedule.'}), 405
     data['assigned_to'] = doctor
     rs.create_data(collection, key, data)
+    send_email(data['assigned_to'], data)
     return jsonify({'status': 'Appointment assigned to the doctor.'})
 
 
