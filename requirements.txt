@@ -1,4 +1,6 @@
 bcrypt==3.2.0
 Flask==2.1.1
+PyJWT
 python-decouple==3.6
 redis==4.2.1
+git+https://github.com/mailchimp/mailchimp-marketing-python.git
