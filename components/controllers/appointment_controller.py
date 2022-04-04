@@ -167,3 +167,6 @@ def my_appointments_search_controller(doctor, payload):
         }), 400
     return apt.my_appointments_search(doctor, start_date, end_date, accepted)
 
+
+def all_appointments_controller():
+    return apt.all_appointments()

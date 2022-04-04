@@ -199,3 +199,7 @@ def appointment_conflict(doctor, date, start, end):
         ):
             conflict_list_id.append(dated_apt['id'])
     return conflict_list_id
+
+
+def all_appointments():
+    return jsonify({'data': list_appointments()})
