@@ -25,7 +25,7 @@ def doctor_availability(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/users/authenticate")
+@blueprint.route("users/authenticate")
 @check_token
 def authenticate(user):
     user_type = check_user_type(user['userID'])
