@@ -1,7 +1,7 @@
 import jwt
 import time
 from decouple import config
-from flask import request
+from flask import request, jsonify
 from functools import wraps
 
 
@@ -48,7 +48,7 @@ def check_token(f):
             }, 401
         result = decode_jwt(token)
         if result.get('error'):
-            return result
+            return jsonify(result), 401
         user = result
         return f(user, *args, **kwargs)
 
