@@ -7,7 +7,7 @@ from components.utils.jwt import check_token
 blueprint = Blueprint('appointments', __name__)
 
 
-@blueprint.route("/create-appointment", methods=['POST'])
+@blueprint.route("/appointments/create", methods=['POST'])
 @check_token
 def create(user):
     user_type = check_user_type(user['userID'])
@@ -16,7 +16,7 @@ def create(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/search-appointment", methods=['POST'])
+@blueprint.route("/appointments/search", methods=['POST'])
 @check_token
 def search(user):
     user_type = check_user_type(user['userID'])
@@ -25,7 +25,7 @@ def search(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/update-appointment", methods=['POST'])
+@blueprint.route("/appointments/update", methods=['POST'])
 @check_token
 def update(user):
     user_type = check_user_type(user['userID'])
@@ -34,7 +34,7 @@ def update(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/assign-appointment", methods=['POST'])
+@blueprint.route("/appointments/assign", methods=['POST'])
 @check_token
 def assign(user):
     user_type = check_user_type(user['userID'])
@@ -43,7 +43,7 @@ def assign(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/accept-appointment", methods=['POST'])
+@blueprint.route("/appointments/accept", methods=['POST'])
 @check_token
 def accept(user):
     user_type = check_user_type(user['userID'])
@@ -52,7 +52,7 @@ def accept(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/delete-appointment", methods=['POST'])
+@blueprint.route("/appointments/delete", methods=['POST'])
 @check_token
 def delete(user):
     user_type = check_user_type(user['userID'])
@@ -61,7 +61,7 @@ def delete(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/my-appointments")
+@blueprint.route("/appointments/my-appointments")
 @check_token
 def my_appointments(user):
     user_type = check_user_type(user['userID'])
@@ -70,10 +70,19 @@ def my_appointments(user):
     return jsonify({'error': 'Unauthorized access.'}), 401
 
 
-@blueprint.route("/my-appointments-search", methods=['POST'])
+@blueprint.route("/appointments/my-appointments-search", methods=['POST'])
 @check_token
 def my_appointments_search(user):
     user_type = check_user_type(user['userID'])
     if user_type == 'doctor':
         return apt_ctrl.my_appointments_search_controller(user['userID'], request.get_json())
+    return jsonify({'error': 'Unauthorized access.'}), 401
+
+
+@blueprint.route("/appointments/all")
+@check_token
+def all_appointments(user):
+    user_type = check_user_type(user['userID'])
+    if user_type == 'scheduler':
+        return apt_ctrl.all_appointments_controller()
     return jsonify({'error': 'Unauthorized access.'}), 401
