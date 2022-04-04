@@ -56,8 +56,7 @@ def update_appointment(payload):
 
     apt_id = data.get('id')
     doctor = data.get('assigned_to')
-    print('DOCTOR:', usr.search_doctor(doctor))
-    if not usr.search_doctor(doctor):
+    if doctor and not usr.search_doctor(doctor):
         return jsonify({
             'error': 'Doctor is not on the list.'
         }), 400
