@@ -2,6 +2,7 @@ import random
 import string
 import time
 from flask import jsonify
+from components.database import users as usr
 from components.utils.sendgrid_mail import send_email
 from components.utils import redis as rs
 
@@ -55,6 +56,12 @@ def update_appointment(payload):
 
     apt_id = data.get('id')
     doctor = data.get('assigned_to')
+    print('DOCTOR:', usr.search_doctor(doctor))
+    if not usr.search_doctor(doctor):
+        return jsonify({
+            'error': 'Doctor is not on the list.'
+        }), 400
+
     conflict_apt_list = appointment_conflict(doctor, data['date'], data['start'], data['end'])
     if apt_id in conflict_apt_list:
         conflict_apt_list.remove(apt_id)
