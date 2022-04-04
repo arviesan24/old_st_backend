@@ -30,5 +30,5 @@ def doctor_availability(user):
 def authenticate(user):
     user_type = check_user_type(user['userID'])
     if user:
-        jsonify({'status': 'OK', 'type': user_type}), 200
+        return jsonify({'status': 'OK', 'type': user_type}), 200
     return jsonify({'error': 'Unauthorized access.'}), 401
