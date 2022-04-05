@@ -115,7 +115,7 @@ def search_appointment_controller(payload):
 
 def assign_appointment_controller(payload):
     apt_id = payload.get('id')
-    assigned_doctor = payload.get('doctor')
+    assigned_doctor = payload.get('assigned_to')
     if not apt_id:
         return jsonify({"error": "Appointment ID missing."}), 400
     if not assigned_doctor:
