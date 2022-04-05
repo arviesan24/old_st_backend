@@ -1,3 +1,4 @@
+import re
 from flask import jsonify
 from components.database import users as usr
 
@@ -14,6 +15,9 @@ def create_user_controller(payload):
         return jsonify({'error': 'Username is required.'}), 400
     if not payload.get('email'):
         return jsonify({'error': 'Email is required.'}), 400
+    email_pattern = re.compile('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$')
+    if not email_pattern.match(payload.get('email')):
+        return jsonify({'error': 'Invalid Email.'}), 400
     if not payload.get('password'):
         return jsonify({'error': 'Password is required.'}), 400
     # Scheduler or Doctor
@@ -52,3 +56,7 @@ def change_doctor_availability_controller(user, payload):
 
 def list_doctors_controller():
     return usr.list_doctors()
+
+
+def get_my_status_controller(username):
+    return jsonify({'data': usr.is_doctor_available(username)})
