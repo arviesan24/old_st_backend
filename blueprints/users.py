@@ -32,3 +32,11 @@ def authenticate(user):
     if user:
         return jsonify({'status': 'OK', 'type': user_type}), 200
     return jsonify({'error': 'Unauthorized access.'}), 401
+
+
+@blueprint.route("/users/all-doctors")
+@check_token
+def all_doctors(user):
+    if user:
+        return user_ctrl.list_doctors_controller()
+    return jsonify({'error': 'Unauthorized access.'}), 401

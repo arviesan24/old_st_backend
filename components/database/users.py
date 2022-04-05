@@ -35,14 +35,20 @@ def check_user_type(username):
     return user['type']
 
 
-def list_doctors():
+def __list_doctors():
     result = list_users()
     output = [user for user in result if user['type']=='doctor']
     return output
 
 
+def list_doctors():
+    result = list_users()
+    output = [user for user in result if user['type']=='doctor']
+    return jsonify({'data': output})
+
+
 def search_doctor(username):
-    doctors = list_doctors()
+    doctors = __list_doctors()
     for doctor in doctors:
         if doctor['username'] == username:
             return doctor

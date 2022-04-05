@@ -48,3 +48,7 @@ def change_doctor_availability_controller(user, payload):
     if not doctor_on_list:
         return jsonify({'error': 'Doctor is not on the list.'}), 400
     return usr.change_doctor_availability(doctor, availability)
+
+
+def list_doctors_controller():
+    return usr.list_doctors()
