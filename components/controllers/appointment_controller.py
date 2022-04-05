@@ -1,7 +1,11 @@
+from datetime import datetime
 from flask import jsonify
 from components.database import appointments as apt
 from components.database import users as usr
 from components.utils import helpers as hlp
+
+
+current_date = datetime.now().strftime("%Y-%m-%d")
 
 
 def create_appointment_controller(payload):
@@ -33,6 +37,8 @@ def create_appointment_controller(payload):
         return jsonify({"error": "Date is invalid. Format('YYYY-MM-DD')"}), 400
     if not hlp.schedule_date_validator(apt_date):
         return jsonify({"error": "Cannot book on Sundays."}), 400
+    if apt_date < current_date:
+        return jsonify({"error": "Cannot book appointment for the past dates."}), 400
 
     if not apt_start:
         return jsonify({"error": "Start time is required."}), 400
@@ -76,6 +82,8 @@ def update_appointment_controller(payload):
         return jsonify({"error": "Date is invalid. Format('YYYY-MM-DD')"}), 400
     if not hlp.schedule_date_validator(apt_date):
         return jsonify({"error": "Cannot book on Sundays."}), 400
+    if apt_date < current_date:
+        return jsonify({"error": "Cannot book appointment for the past dates."}), 400
 
     if apt_start and not hlp.time_validator(apt_start):
         return jsonify({"error": "Start time is invalid. Format('HH:MM')"}), 400
